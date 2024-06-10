@@ -40,9 +40,54 @@ total_connections = sum(number_of_friends(user) for user in users)
 # obter a média
 num_users = len(users)
 avg_connections = total_connections / num_users
-print("Número de usuários: ", num_users)
+print("\nNúmero de usuários: ", num_users)
 print("Média de conexões por usuário: ", avg_connections)
 
 
 ###### Pessoas mais conectadas
 # Pessoas mais conectadas: são as que possuem o maior número de amigos.
+# Ordenar os usuários pelo número de amigos em ordem decrescente
+sorted_users = sorted(users, key=number_of_friends, reverse=True)
+
+# Imprimir a lista dos usuários mais conectados
+print("\nPessoas mais conectadas:")
+for user in sorted_users:
+    print(f"{user['name']} tem {number_of_friends(user)} amigos.")
+
+###### Cientista de dados que talvez você conheça
+# Para cada amigo de um usuário, iterar sobre o amigo daquela pessoa e coleta
+#   os resultados
+
+def friends_of_friends_ids_bad(user):
+    return [foaf['id']
+            for friend in user['friends']
+            for foaf in friend['friends']]
+
+# Para users[0] (Hero), temos
+print("\nCientista de dados que talvez você conheça")
+print("Hero (users[0])")
+print(friends_of_friends_ids_bad(users[0]))
+
+###### Amigos em comum
+print("\nAmigos em comum")
+from collections import Counter
+
+def not_the_same(user, other_user):
+    """dois usuários não são os mesmos se possuem ids diferentes"""
+    return user["id"] != other_user["id"]
+
+def not_friends(user, other_user):
+    """other_user não é um amigo se não está em user["friends"]"""
+    return all(not_the_same(friend, other_user)
+               for friend in user["friends"])
+
+def friends_of_friend_ids(user):
+    return Counter(foaf['id'] 
+                   for friend in user['friends']
+                   for foaf in friend['friends']
+                     if not_the_same(user, foaf)
+                     and not_friends(user,foaf))
+
+print("Amigos do usuário")
+print(users[3]["name"])
+print(friends_of_friend_ids(users[3]))
